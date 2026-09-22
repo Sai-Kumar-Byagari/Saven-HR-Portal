@@ -1,5 +1,6 @@
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
+import { logService } from '../services/logService';
 
 // Use relative /api so Vite proxy handles it in dev (avoids CORS)
 // In production, set VITE_API_BASE_URL to the real server URL
@@ -70,6 +71,16 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    if (error.response?.status !== 401) {
+      logService.error(`API ${error.config?.method?.toUpperCase()} ${error.config?.url} failed`, {
+        context: 'axios',
+        metadata: {
+          status: error.response?.status,
+          message: error.response?.data?.message,
+        },
+      });
     }
 
     return Promise.reject(error);

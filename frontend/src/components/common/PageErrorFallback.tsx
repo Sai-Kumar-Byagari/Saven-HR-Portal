@@ -1,11 +1,11 @@
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from './config/queryClient';
-import AppRouter from './router/AppRouter';
-import ErrorBoundary from './components/common/ErrorBoundary';
+interface PageErrorFallbackProps {
+  error: Error | null;
+  onReset: () => void;
+}
 
-function AppErrorFallback({ error }) {
+export default function PageErrorFallback({ error, onReset }: PageErrorFallbackProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-8">
+    <div className="w-full flex items-center justify-center py-20 px-4">
       <div className="bg-white rounded-xl border border-red-200 p-8 max-w-lg text-center shadow-lg">
         <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -13,27 +13,14 @@ function AppErrorFallback({ error }) {
           </svg>
         </div>
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Something went wrong</h2>
-        <p className="text-sm text-gray-500 mb-4">{error?.message}</p>
+        <p className="text-sm text-gray-500 mb-4">{error?.message || 'An unexpected error occurred'}</p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={onReset}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
         >
-          Reload Page
+          Try Again
         </button>
       </div>
     </div>
-  );
-}
-
-export default function App() {
-  return (
-    <ErrorBoundary
-      context="App"
-      fallback={({ error }) => <AppErrorFallback error={error} />}
-    >
-      <QueryClientProvider client={queryClient}>
-        <AppRouter />
-      </QueryClientProvider>
-    </ErrorBoundary>
   );
 }

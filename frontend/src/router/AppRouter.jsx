@@ -6,6 +6,7 @@ import DashboardLayout from '../layouts/DashboardLayout';
 import AuthLayout from '../layouts/AuthLayout';
 import PageLoader from '../components/ui/PageLoader';
 import Spinner from '../components/ui/Spinner';
+import ErrorBoundary from '../components/common/ErrorBoundary';
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const LoginPage                = lazy(() => import('../pages/auth/LoginPage'));
@@ -124,15 +125,15 @@ export default function AppRouter() {
 
           {/* ── First-login (no sidebar) ────────────────────────── */}
           <Route path="/first-login/set-password"
-            element={<ProtectedRoute><FirstLoginSetPasswordPage /></ProtectedRoute>} />
+            element={<ProtectedRoute><ErrorBoundary context="FirstLogin"><FirstLoginSetPasswordPage /></ErrorBoundary></ProtectedRoute>} />
 
           {/* ── Onboarding wizard (no sidebar) ──────────────────── */}
           <Route path="/onboarding"
-            element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
+            element={<ProtectedRoute><ErrorBoundary context="Onboarding"><OnboardingWizard /></ErrorBoundary></ProtectedRoute>} />
 
           {/* ── New employee joining forms (no sidebar) ──────────── */}
           <Route path="/onboarding/forms"
-            element={<ProtectedRoute><EmployeeFormsWizard /></ProtectedRoute>} />
+            element={<ProtectedRoute><ErrorBoundary context="EmployeeForms"><EmployeeFormsWizard /></ErrorBoundary></ProtectedRoute>} />
 
           {/* ── Protected dashboard routes ───────────────────────── */}
           <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
