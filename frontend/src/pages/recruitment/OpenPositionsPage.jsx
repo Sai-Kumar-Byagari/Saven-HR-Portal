@@ -8,7 +8,8 @@ import { StatusBadge } from '../../components/ui/Badge';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import { formatIndianDate } from '../../utils/dateHelpers';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
 
@@ -59,7 +60,7 @@ function downloadJD(position) {
 
 export default function OpenPositionsPage() {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const role = user?.role;
   const canCreate = ['super_admin', 'hr'].includes(role);
 

@@ -4,7 +4,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { teamsApi } from '../../api/teams.api';
 import { usersApi } from '../../api/users.api';
 import { queryClient } from '../../config/queryClient';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -103,7 +104,7 @@ function MessageBubble({ msg, projectId, projectLabel, currentUserId, onReply })
 export default function TeamDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const [activeTab, setActiveTab] = useState('members');
   const [showAddMember, setShowAddMember] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);

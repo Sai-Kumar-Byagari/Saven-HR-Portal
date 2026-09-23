@@ -3,13 +3,15 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { authApi } from '../../api/auth.api';
-import useAuthStore from '../../store/authStore';
+import { authService } from '../../services/authService';
+import { normalizeError } from '../../utils/apiError';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { selectUser, updateUser } from '../../store/slices/authSlice';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
 
-const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 
 const schema = z.object({
   new_password: z.string().regex(PASSWORD_REGEX, 'Min 8 chars, 1 uppercase, 1 number, 1 special character'),
@@ -20,22 +22,22 @@ const schema = z.object({
 
 export default function FirstLoginSetPasswordPage() {
   const navigate = useNavigate();
-  const { user, updateUser } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
 
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) });
 
   const mutation = useMutation({
-    mutationFn: (data) => authApi.setFirstLoginPassword({ new_password: data.new_password }),
-    onSuccess: (res) => {
-      const data = res.data.data;
-      updateUser({
+    mutationFn: (data) => authService.setFirstLoginPassword({ new_password: data.new_password }),
+    onSuccess: (data) => {
+      dispatch(updateUser({
         isFirstLogin: false,
         employeeType: data.employeeType,
         onboardingComplete: data.onboardingComplete,
         personalEmail: data.personalEmail,
         empId: data.empId,
         doj: data.doj,
-      });
+      }));
       toast.success('Password set! Welcome to Saven HR Portal.');
       if (data.employeeType === 'new' && !data.onboardingComplete) {
         navigate('/onboarding/forms'); // New employees fill joining forms first
@@ -46,7 +48,7 @@ export default function FirstLoginSetPasswordPage() {
         navigate('/settings?setup=1');
       }
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Failed to set password'),
+    onError: (error) => toast.error(normalizeError(error).message || 'Failed to set password'),
   });
 
   return (

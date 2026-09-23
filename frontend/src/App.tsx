@@ -1,9 +1,15 @@
+import { Provider } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { store } from './store/store';
 import { queryClient } from './config/queryClient';
 import AppRouter from './router/AppRouter';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
-function AppErrorFallback({ error }) {
+interface AppErrorFallbackProps {
+  error: Error | null;
+}
+
+function AppErrorFallback({ error }: AppErrorFallbackProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-8">
       <div className="bg-white rounded-xl border border-red-200 p-8 max-w-lg text-center shadow-lg">
@@ -31,9 +37,11 @@ export default function App() {
       context="App"
       fallback={({ error }) => <AppErrorFallback error={error} />}
     >
-      <QueryClientProvider client={queryClient}>
-        <AppRouter />
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <AppRouter />
+        </QueryClientProvider>
+      </Provider>
     </ErrorBoundary>
   );
 }

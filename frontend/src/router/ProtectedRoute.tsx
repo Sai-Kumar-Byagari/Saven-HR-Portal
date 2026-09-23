@@ -1,11 +1,19 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import useAuthStore from '../store/authStore';
+import type { ReactNode } from 'react';
+import { useAppSelector } from '../store/hooks';
+import { selectUser, selectIsAuthenticated } from '../store/slices/authSlice';
+import type { UserRole } from '../types/auth.types';
 
 // Roles that never need onboarding forms
-const FORMS_EXEMPT = ['super_admin', 'hr', 'payroll'];
+const FORMS_EXEMPT: UserRole[] = ['super_admin', 'hr', 'payroll'];
 
-export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, user } = useAuthStore();
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const user = useAppSelector(selectUser);
   const location = useLocation();
 
   // ── Not logged in ─────────────────────────────────────────────────────────
@@ -20,9 +28,6 @@ export default function ProtectedRoute({ children }) {
 
   const onSettings = location.pathname.startsWith('/settings');
   const onForms    = location.pathname.startsWith('/onboarding/forms');
-  const onMyForms  = location.pathname.startsWith('/onboarding/my-forms');
-  const onAny      = onSettings || onForms || onMyForms;
-
   // ── Step 2: New employees fill joining forms before anything else ──────────
   const formSubmitted = user.formSubmitted ||
     (user?.id && localStorage.getItem(`form_submitted_${user.id}`) === 'true');

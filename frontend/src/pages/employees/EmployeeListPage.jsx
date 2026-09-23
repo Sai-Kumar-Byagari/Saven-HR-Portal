@@ -11,7 +11,8 @@ import Avatar from '../../components/ui/Avatar';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { ROLE_LABELS } from '../../config/roles';
 import { formatIndianDate } from '../../utils/dateHelpers';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUserRole } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 export default function EmployeeListPage() {
@@ -20,7 +21,7 @@ export default function EmployeeListPage() {
   const [search, setSearch] = useState('');
   const [confirmId, setConfirmId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-  const role = useAuthStore((s) => s.user?.role);
+  const role = useAppSelector(selectUserRole);
   const canDelete = ['super_admin', 'hr'].includes(role);
 
   const { data, isLoading, error } = useQuery({

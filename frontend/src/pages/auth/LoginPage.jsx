@@ -3,8 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { authApi } from '../../api/auth.api';
-import useAuthStore from '../../store/authStore';
+import { authService } from '../../services/authService';
+import { normalizeError } from '../../utils/apiError';
+import { useAppDispatch } from '../../store/hooks';
+import { setAuth } from '../../store/slices/authSlice';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
@@ -16,17 +18,16 @@ const schema = z.object({
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setAuth } = useAuthStore();
+  const dispatch = useAppDispatch();
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
   });
 
   const mutation = useMutation({
-    mutationFn: (data) => authApi.login(data),
-    onSuccess: ({ data }) => {
-      const { accessToken, user } = data.data;
-      setAuth(user, accessToken);
+    mutationFn: authService.login,
+    onSuccess: ({ accessToken, user }) => {
+      dispatch(setAuth({ user, accessToken }));
       if (user.isFirstLogin) {
         navigate('/first-login/set-password');
       } else if (user.employeeType === 'new' && !user.onboardingComplete) {
@@ -35,9 +36,8 @@ export default function LoginPage() {
         navigate('/dashboard');
       }
     },
-    onError: (err) => {
-      const msg = err.response?.data?.message || err.message || 'Login failed. Please try again.';
-      toast.error(msg);
+    onError: (error) => {
+      toast.error(normalizeError(error).message || 'Login failed. Please try again.');
     },
   });
 

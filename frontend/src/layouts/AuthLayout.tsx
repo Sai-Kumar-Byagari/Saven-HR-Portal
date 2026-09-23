@@ -1,8 +1,10 @@
-import { Outlet, Navigate } from 'react-router-dom';
-import useAuthStore from '../store/authStore';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAppSelector } from '../store/hooks';
+import { selectUser, selectIsAuthenticated } from '../store/slices/authSlice';
 
 export default function AuthLayout() {
-  const { isAuthenticated, user } = useAuthStore();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const user = useAppSelector(selectUser);
 
   if (isAuthenticated && user && !user.isFirstLogin) {
     return <Navigate to="/dashboard" replace />;

@@ -6,7 +6,8 @@ import { profileApi } from '../../api/profile.api';
 import { documentsApi } from '../../api/documents.api';
 import { onboardingApi } from '../../api/onboarding.api';
 import { queryClient } from '../../config/queryClient';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { selectUser, updateUser } from '../../store/slices/authSlice';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Avatar from '../../components/ui/Avatar';
@@ -16,7 +17,7 @@ import { formatIndianDate } from '../../utils/dateHelpers';
 import { getFileUrl } from '../../utils/fileUrl';
 import toast from 'react-hot-toast';
 
-const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 
 const newPasswordSchema = z.object({
   new_password: z.string().regex(PASSWORD_REGEX, 'Min 8 chars, 1 uppercase, 1 number, 1 special character'),
@@ -38,7 +39,8 @@ const DOC_TYPES = [
 const BASE_TABS = ['Personal Info', 'Bank Details', 'Documents'];
 
 export default function SettingsPage() {
-  const { user, updateUser } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Personal Info');
@@ -55,7 +57,7 @@ export default function SettingsPage() {
   const completeMutation = useMutation({
     mutationFn: onboardingApi.complete,
     onSuccess: () => {
-      updateUser({ onboardingComplete: true });
+      dispatch(updateUser({ onboardingComplete: true }));
       toast.success('Profile complete! Welcome to Saven HR Portal 🎉');
       navigate('/dashboard');
     },
@@ -135,7 +137,7 @@ export default function SettingsPage() {
   /* ── Photo upload ────────────────────────────────── */
   const photoMutation = useMutation({
     mutationFn: (file) => { const fd = new FormData(); fd.append('photo', file); return profileApi.uploadPhoto(fd); },
-    onSuccess: (res) => { updateUser({ profilePhoto: res.data.data.profile_photo }); toast.success('Photo updated!'); queryClient.invalidateQueries({ queryKey: ['profile'] }); },
+    onSuccess: (res) => { dispatch(updateUser({ profilePhoto: res.data.data.profile_photo })); toast.success('Photo updated!'); queryClient.invalidateQueries({ queryKey: ['profile'] }); },
     onError: () => toast.error('Failed to upload photo'),
   });
 

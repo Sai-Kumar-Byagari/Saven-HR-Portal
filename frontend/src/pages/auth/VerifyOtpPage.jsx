@@ -1,7 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { authApi } from '../../api/auth.api';
+import { authService } from '../../services/authService';
+import { normalizeError } from '../../utils/apiError';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
@@ -14,12 +15,12 @@ export default function VerifyOtpPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const mutation = useMutation({
-    mutationFn: (data) => authApi.verifyOtp({ personal_email: email, otp: data.otp }),
+    mutationFn: (data) => authService.verifyOtp({ personal_email: email, otp: data.otp }),
     onSuccess: () => {
       toast.success('OTP verified!');
       navigate('/reset-password', { state: { email } });
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Invalid OTP'),
+    onError: (error) => toast.error(normalizeError(error).message || 'Invalid OTP'),
   });
 
   if (!email) {

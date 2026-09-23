@@ -7,7 +7,8 @@ import { StatusBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import toast from 'react-hot-toast';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 
 const ROUND_LABELS = { phone: '📞 Round 1 — Telephonic', technical: '💻 Round 2 — Technical', hr: '🤝 Round 3 — Final HR' };
 const STATUS_COLORS = {
@@ -18,7 +19,7 @@ const STATUS_COLORS = {
 
 export default function InterviewsPage() {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const [expandedPosition, setExpandedPosition] = useState(null);
 
   const { data, isLoading } = useQuery({

@@ -2,8 +2,9 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { notificationsApi } from '../../api/notifications.api';
-import useNotificationStore from '../../store/notificationStore';
-import useUiStore from '../../store/uiStore';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { selectNotifications, setNotifications, markRead, markAllRead, removeNotification } from '../../store/slices/notificationSlice';
+import { selectNotificationPanelOpen, closeNotificationPanel } from '../../store/slices/uiSlice';
 import { queryClient } from '../../config/queryClient';
 
 const TYPE_DOT = {
@@ -28,8 +29,9 @@ function timeAgo(dateStr) {
 }
 
 export default function NotificationPanel() {
-  const { notificationPanelOpen, closeNotificationPanel } = useUiStore();
-  const { notifications, setNotifications, markRead, markAllRead, removeNotification } = useNotificationStore();
+  const notificationPanelOpen = useAppSelector(selectNotificationPanelOpen);
+  const notifications = useAppSelector(selectNotifications);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const panelRef = useRef(null);
 
@@ -38,26 +40,26 @@ export default function NotificationPanel() {
     if (!notificationPanelOpen) return;
     function handleClick(e) {
       if (panelRef.current && !panelRef.current.contains(e.target)) {
-        closeNotificationPanel();
+        dispatch(closeNotificationPanel());
       }
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
-  }, [notificationPanelOpen, closeNotificationPanel]);
+  }, [notificationPanelOpen, dispatch]);
 
   // Close on Escape
   useEffect(() => {
     if (!notificationPanelOpen) return;
-    function handleKey(e) { if (e.key === 'Escape') closeNotificationPanel(); }
+    function handleKey(e) { if (e.key === 'Escape') dispatch(closeNotificationPanel()); }
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [notificationPanelOpen, closeNotificationPanel]);
+  }, [notificationPanelOpen, dispatch]);
 
   const { isLoading } = useQuery({
     queryKey: ['notifications', 'list'],
     queryFn: async () => {
       const res = await notificationsApi.getAll({ limit: 25 });
-      setNotifications(res.data.data || []);
+      dispatch(setNotifications(res.data.data || []));
       return res.data.data;
     },
     enabled: notificationPanelOpen,
@@ -68,7 +70,7 @@ export default function NotificationPanel() {
   const deleteMutation = useMutation({
     mutationFn: (id) => notificationsApi.delete(id),
     onSuccess: (_, id) => {
-      removeNotification(id);
+      dispatch(removeNotification(id));
       // Immediately refetch the server count so the badge stays in sync
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unreadCount'] });
       queryClient.refetchQueries({ queryKey: ['notifications', 'unreadCount'] });
@@ -78,7 +80,7 @@ export default function NotificationPanel() {
   const markAllMutation = useMutation({
     mutationFn: () => notificationsApi.markAllRead(),
     onSuccess: () => {
-      markAllRead();
+      dispatch(markAllRead());
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unreadCount'] });
       queryClient.refetchQueries({ queryKey: ['notifications', 'unreadCount'] });
     },
@@ -87,7 +89,7 @@ export default function NotificationPanel() {
   function handleClick(n) {
     // Delete notification when user clicks it, then navigate
     deleteMutation.mutate(n.id);
-    closeNotificationPanel();
+    dispatch(closeNotificationPanel());
     if (n.navigate_to) {
       // Normalise navigate_to — some paths like /my-projects/123 have no matching route.
       // Map them to the closest valid page.
@@ -137,7 +139,7 @@ export default function NotificationPanel() {
             </button>
           )}
           <button
-            onClick={closeNotificationPanel}
+            onClick={() => dispatch(closeNotificationPanel())}
             className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Close notifications"
           >

@@ -6,13 +6,14 @@ import { queryClient } from '../../config/queryClient';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 export default function EmployeeEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user: authUser } = useAuthStore();
+  const authUser = useAppSelector(selectUser);
 
   const { data: employee, isLoading } = useQuery({
     queryKey: ['users', id],

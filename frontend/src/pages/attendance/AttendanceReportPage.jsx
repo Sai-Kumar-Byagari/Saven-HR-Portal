@@ -9,7 +9,9 @@ import Avatar from '../../components/ui/Avatar';
 import Spinner from '../../components/ui/Spinner';
 import { queryClient } from '../../config/queryClient';
 import toast from 'react-hot-toast';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
+import { store } from '../../store/store';
 
 function PhotoLink({ path, label }) {
   if (!path) return <span className="text-gray-300 text-xs">—</span>;
@@ -115,7 +117,7 @@ export default function AttendanceReportPage({ scope = 'team' }) {
   const today                   = new Date().toISOString().split('T')[0];
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate]     = useState(today);
-  const user = useAuthStore((s) => s.user);
+  const user = useAppSelector(selectUser);
   const canUpdateStatus = user?.role === 'super_admin' || user?.role === 'manager';
 
   // Confirmation modal state
@@ -174,7 +176,7 @@ export default function AttendanceReportPage({ scope = 'team' }) {
 
   const handleDownloadCsv = () => {
     const url = `${window.location.origin}/api/attendance/report?month=${reportMonth}&year=${reportYear}&format=csv`;
-    const token = useAuthStore.getState().accessToken;
+    const token = store.getState().auth.accessToken;
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.blob())
       .then(blob => {

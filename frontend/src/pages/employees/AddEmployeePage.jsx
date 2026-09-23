@@ -7,7 +7,8 @@ import { usersApi } from '../../api/users.api';
 import { queryClient } from '../../config/queryClient';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 const schema = z.object({
@@ -28,7 +29,7 @@ const SENIOR_ROLES = ['super_admin', 'manager', 'hr', 'payroll', 'it'];
 
 export default function AddEmployeePage() {
   const navigate = useNavigate();
-  const { user: authUser } = useAuthStore();
+  const authUser = useAppSelector(selectUser);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(schema),

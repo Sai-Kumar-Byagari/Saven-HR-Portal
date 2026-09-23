@@ -3,12 +3,13 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { authApi } from '../../api/auth.api';
+import { authService } from '../../services/authService';
+import { normalizeError } from '../../utils/apiError';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
 
-const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 
 const schema = z.object({
   otp: z.string().length(6, 'OTP must be 6 digits'),
@@ -27,12 +28,16 @@ export default function ResetPasswordPage() {
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) });
 
   const mutation = useMutation({
-    mutationFn: (data) => authApi.resetPassword({ personal_email: email, ...data }),
+    mutationFn: (data) => authService.resetPassword({
+      personal_email: email,
+      otp: data.otp,
+      new_password: data.new_password,
+    }),
     onSuccess: () => {
       toast.success('Password reset successfully! Please sign in.');
       navigate('/login');
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Reset failed'),
+    onError: (error) => toast.error(normalizeError(error).message || 'Reset failed'),
   });
 
   return (

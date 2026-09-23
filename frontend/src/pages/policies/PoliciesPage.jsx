@@ -7,13 +7,14 @@ import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { formatIndianDate } from '../../utils/dateHelpers';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUserRole } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 const CATEGORIES = ['Leave Policy', 'Code of Conduct', 'IT Policy', 'HR Policy', 'Finance Policy', 'Travel Policy', 'Other'];
 
 export default function PoliciesPage() {
-  const role = useAuthStore((s) => s.user?.role);
+  const role = useAppSelector(selectUserRole);
   const canManage = ['super_admin', 'hr'].includes(role);
   const [showUpload, setShowUpload] = useState(false);
   const [deleteId, setDeleteId] = useState(null);

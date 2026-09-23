@@ -3,7 +3,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
-import { authApi } from '../../api/auth.api';
+import { authService } from '../../services/authService';
+import { normalizeError } from '../../utils/apiError';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
@@ -17,12 +18,12 @@ export default function ForgotPasswordPage() {
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) });
 
   const mutation = useMutation({
-    mutationFn: authApi.forgotPassword,
+    mutationFn: authService.forgotPassword,
     onSuccess: (_, vars) => {
       toast.success('OTP sent to your personal email.');
       navigate('/verify-otp', { state: { email: vars.personal_email } });
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Failed to send OTP'),
+    onError: (error) => toast.error(normalizeError(error).message || 'Failed to send OTP'),
   });
 
   return (

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { employeeFormApi } from '../../api/employeeForm.api';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { selectUser, updateUser } from '../../store/slices/authSlice';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
 import JoiningLetterStep from './JoiningLetterStep';
@@ -12,7 +13,8 @@ const STEPS = ['Joining Letter', 'Personal Info', 'Review & Submit'];
 
 export default function EmployeeFormsWizard() {
   const navigate = useNavigate();
-  const { user, updateUser } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState({});
 
@@ -31,7 +33,7 @@ export default function EmployeeFormsWizard() {
       // If already submitted/approved — persist flag so ProtectedRoute allows dashboard access
       if (d?.status === 'submitted' || d?.status === 'approved') {
         if (user?.id) localStorage.setItem(`form_submitted_${user.id}`, 'true');
-        updateUser({ formSubmitted: true });
+        dispatch(updateUser({ formSubmitted: true }));
       }
     },
     staleTime: 0,

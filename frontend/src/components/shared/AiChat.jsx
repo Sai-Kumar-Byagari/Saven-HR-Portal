@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { chatApi } from '../../api/chat.api';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 
 const SUGGESTED = {
   super_admin: [
@@ -30,7 +31,7 @@ const SUGGESTED = {
 };
 
 export default function AiChat() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const suggestions = SUGGESTED[user?.role] || SUGGESTED.default;
 
   const [open, setOpen]       = useState(false);

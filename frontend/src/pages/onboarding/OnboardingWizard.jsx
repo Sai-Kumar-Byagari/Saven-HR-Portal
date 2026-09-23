@@ -6,7 +6,8 @@ import { profileApi } from '../../api/profile.api';
 import { documentsApi } from '../../api/documents.api';
 import { onboardingApi } from '../../api/onboarding.api';
 import { queryClient } from '../../config/queryClient';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { selectUser, updateUser } from '../../store/slices/authSlice';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -25,7 +26,8 @@ const DOC_TYPES = [
 
 export default function OnboardingWizard() {
   const navigate = useNavigate();
-  const { user, updateUser } = useAuthStore();
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const [step, setStep] = useState(0);
   const [uploadedDocs, setUploadedDocs] = useState({});
   const [personalData, setPersonalData] = useState({});
@@ -49,7 +51,7 @@ export default function OnboardingWizard() {
   const completeMutation = useMutation({
     mutationFn: onboardingApi.complete,
     onSuccess: () => {
-      updateUser({ onboardingComplete: true });
+      dispatch(updateUser({ onboardingComplete: true }));
       toast.success('Onboarding complete! Welcome to Saven Technologies! 🎉');
       queryClient.invalidateQueries();
       navigate('/dashboard');

@@ -44,7 +44,7 @@ function TreeNode({ node }) {
                 {/* Horizontal connector bar — sits at top of this div */}
                 <div
                   className="absolute top-0 h-px bg-gray-300"
-                  style={{ left: '50%', right: '0',
+                  style={{
                     width: '100%', transform: 'none',
                     left: `calc(50% / ${children.length})`,
                     right: `calc(50% / ${children.length})`,

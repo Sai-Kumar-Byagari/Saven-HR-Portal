@@ -12,12 +12,13 @@ import { ROLE_LABELS, ROLE_COLORS } from '../../config/roles';
 import { formatIndianDate } from '../../utils/dateHelpers';
 import Spinner from '../../components/ui/Spinner';
 import Button from '../../components/ui/Button';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 import { getFileUrl } from '../../utils/fileUrl';
 
-const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 const resetPasswordSchema = z.object({
   new_password: z.string().regex(PASSWORD_REGEX, 'Min 8 chars, 1 uppercase, 1 number, 1 special character'),
   confirm_password: z.string(),
@@ -30,7 +31,7 @@ const BASE_DETAIL_TABS = ['Overview', 'Personal Info', 'Bank Details', 'Document
 export default function EmployeeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user: authUser } = useAuthStore();
+  const authUser = useAppSelector(selectUser);
   const [activeTab, setActiveTab] = useState('Overview');
 
   // Only admin/HR can see the Reset Password tab

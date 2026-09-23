@@ -19,10 +19,11 @@ export interface AuthUser {
   onboardingComplete: boolean;
   profilePhoto: string | null;
   doj: string | null;
+  formSubmitted?: boolean;
 }
 
 export interface LoginRequest {
-  workEmail: string;
+  work_email: string;
   password: string;
 }
 
@@ -36,31 +37,33 @@ export interface RefreshResponse {
 }
 
 export interface SetFirstLoginPasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-  personalEmail: string;
+  new_password: string;
 }
 
 export interface SetFirstLoginPasswordResponse {
   isFirstLogin: false;
   employeeType: string;
   onboardingComplete: boolean;
-  personalEmail: string;
-  empId: string;
-  doj: string;
+  personalEmail: string | null;
+  empId: string | null;
+  doj: string | null;
 }
 
 export interface ForgotPasswordRequest {
-  personalEmail: string;
+  personal_email: string;
 }
 
 export interface VerifyOtpRequest {
-  personalEmail: string;
+  personal_email: string;
   otp: string;
 }
 
+export interface VerifyOtpResponse {
+  verified: true;
+}
+
 export interface ResetPasswordRequest {
-  personalEmail: string;
+  personal_email: string;
   otp: string;
-  newPassword: string;
+  new_password: string;
 }

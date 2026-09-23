@@ -4,7 +4,6 @@ import ProtectedRoute from './ProtectedRoute';
 import RoleRoute from './RoleRoute';
 import DashboardLayout from '../layouts/DashboardLayout';
 import AuthLayout from '../layouts/AuthLayout';
-import PageLoader from '../components/ui/PageLoader';
 import Spinner from '../components/ui/Spinner';
 import ErrorBoundary from '../components/common/ErrorBoundary';
 
@@ -82,15 +81,6 @@ const OnboardingSummaryPage    = lazy(() => import('../pages/onboarding/Onboardi
 // ── Settings ──────────────────────────────────────────────────────────────────
 const SettingsPage             = lazy(() => import('../pages/settings/SettingsPage'));
 const AuditLogsPage            = lazy(() => import('../pages/settings/AuditLogsPage'));
-
-// ── Loading fallback ──────────────────────────────────────────────────────────
-function PageFallback() {
-  return (
-    <div className="w-full pt-4">
-      <PageLoader />
-    </div>
-  );
-}
 
 // Eagerly preload the most visited pages after initial load
 function PreloadPages() {

@@ -6,12 +6,13 @@ import { policiesApi } from '../../api/policies.api';
 import { onboardingApi } from '../../api/onboarding.api';
 import StatCard from '../../components/ui/StatCard';
 import ClockInWidget from '../../components/shared/ClockInWidget';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 
 const SI = (d) => <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">{d}</svg>;
 
 export default function HRDashboard() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const { data: employees, isLoading: l1 } = useQuery({ queryKey: ['users','all'],       queryFn: async () => { const r = await usersApi.getAll({ limit:1 }); return r.data; } });
   const { data: positions, isLoading: l2 } = useQuery({ queryKey: ['positions','open'],  queryFn: async () => { const r = await recruitmentApi.getPositions({ status:'open',limit:1 }); return r.data; } });
   const { data: pending,   isLoading: l3 } = useQuery({ queryKey: ['leaves','pending'],  queryFn: async () => { const r = await leavesApi.getPending({ limit:1 }); return r.data; } });

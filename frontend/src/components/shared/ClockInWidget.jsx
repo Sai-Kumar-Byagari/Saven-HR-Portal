@@ -7,13 +7,14 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { attendanceApi } from '../../api/attendance.api';
 import { queryClient } from '../../config/queryClient';
 import { getFileUrl } from '../../utils/fileUrl';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import Button from '../ui/Button';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
 export default function ClockInWidget() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
 
   const [showCamera, setShowCamera]     = useState(false);
   const [punchType, setPunchType]       = useState(null); // 'in' | 'out'

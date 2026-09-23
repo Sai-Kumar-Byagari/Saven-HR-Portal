@@ -5,13 +5,14 @@ import { leavesApi } from '../../api/leaves.api';
 import StatCard from '../../components/ui/StatCard';
 import AttendanceBarChart from '../../components/charts/AttendanceBarChart';
 import ClockInWidget from '../../components/shared/ClockInWidget';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import { format } from 'date-fns';
 
 const SI = (d) => <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">{d}</svg>;
 
 export default function ManagerDashboard() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const today = new Date().toISOString().split('T')[0];
 
   const { data: team,    isLoading: l1 } = useQuery({ queryKey: ['users','team'],       queryFn: async () => { const r = await usersApi.getTeam({ limit:1 }); return r.data; } });

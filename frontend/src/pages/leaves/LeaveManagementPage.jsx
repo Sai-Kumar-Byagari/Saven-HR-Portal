@@ -4,7 +4,7 @@ import { leavesApi } from '../../api/leaves.api';
 import { attendanceApi } from '../../api/attendance.api';
 import Spinner from '../../components/ui/Spinner';
 import { ROLE_LABELS } from '../../config/roles';
-import useAuthStore from '../../store/authStore';
+import { store } from '../../store/store';
 import toast from 'react-hot-toast';
 
 function UserReportModal({ userId, userName, onClose }) {
@@ -16,7 +16,7 @@ function UserReportModal({ userId, userName, onClose }) {
 
   const handleDownloadCsv = () => {
     const url = `${window.location.origin}/api/attendance/user-report/${userId}?format=csv`;
-    const token = useAuthStore.getState().accessToken;
+    const token = store.getState().auth.accessToken;
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.blob())
       .then(blob => {

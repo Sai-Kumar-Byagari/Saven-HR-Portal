@@ -2,6 +2,8 @@ import js from '@eslint/js';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
+import tsParser from '@typescript-eslint/parser';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   js.configs.recommended,
@@ -64,6 +66,7 @@ export default [
     rules: {
       // React
       'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-vars': 'error',
       'react/prop-types': 'off',
       'react/display-name': 'off',
       'react/no-unescaped-entities': 'warn',
@@ -84,6 +87,29 @@ export default [
       'no-console': 'off',
       'no-empty': ['warn', { allowEmptyCatch: true }],
       'prefer-const': 'warn',
+    },
+  },
+
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    rules: {
+      // The base rule cannot understand TypeScript type-only declarations.
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
     },
   },
 

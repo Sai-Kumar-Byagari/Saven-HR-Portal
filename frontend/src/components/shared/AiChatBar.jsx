@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { chatApi } from '../../api/chat.api';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 
 const SUGGESTED = {
   super_admin: [
@@ -42,7 +43,7 @@ function TypingDots() {
 }
 
 export default function AiChatBar() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const navigate  = useNavigate();
   const suggestions = SUGGESTED[user?.role] || SUGGESTED.default;
 

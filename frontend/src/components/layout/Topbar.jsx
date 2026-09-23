@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import useAuthStore from '../../store/authStore';
-import useNotificationStore from '../../store/notificationStore';
-import useUiStore from '../../store/uiStore';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
+import { selectUnreadCount, setUnreadCount } from '../../store/slices/notificationSlice';
+import { selectNotificationPanelOpen, toggleNotificationPanel } from '../../store/slices/uiSlice';
 import { notificationsApi } from '../../api/notifications.api';
 import { settingsApi } from '../../api/settings.api';
 import { sidebarGroups } from '../../config/sidebarConfig';
@@ -32,9 +33,10 @@ const PAGE_ICONS = {
 };
 
 export default function Topbar() {
-  const { user } = useAuthStore();
-  const { unreadCount, setUnreadCount } = useNotificationStore();
-  const { notificationPanelOpen, toggleNotificationPanel } = useUiStore();
+  const user = useAppSelector(selectUser);
+  const unreadCount = useAppSelector(selectUnreadCount);
+  const notificationPanelOpen = useAppSelector(selectNotificationPanelOpen);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [dbResults, setDbResults] = useState(null);
@@ -47,7 +49,7 @@ export default function Topbar() {
     queryKey: ['notifications', 'unreadCount'],
     queryFn: async () => {
       const res = await notificationsApi.getUnreadCount();
-      setUnreadCount(res.data.data.count);
+      dispatch(setUnreadCount(res.data.data.count));
       return res.data.data.count;
     },
     refetchInterval: 30000,
@@ -215,7 +217,7 @@ export default function Topbar() {
       {/* Notification bell */}
       <div className="relative shrink-0">
         <button
-          onClick={toggleNotificationPanel}
+          onClick={() => dispatch(toggleNotificationPanel())}
           className="relative w-9 h-9 flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
           aria-label={`${unreadCount} unread notifications`}
         >

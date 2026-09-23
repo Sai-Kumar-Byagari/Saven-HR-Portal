@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { teamsApi } from '../../api/teams.api';
 import { queryClient } from '../../config/queryClient';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import { formatIndianDate } from '../../utils/dateHelpers';
 import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
@@ -134,7 +135,7 @@ function MessageThread({ msg, projectId, projectName, teamColor, userId }) {
 
 // ── Project card (used in Projects tab) ──────────────────────────────────────
 function ProjectCard({ membership, project, teamColor, teamName }) {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const [updateModal, setUpdateModal] = useState(false);
   const [updateForm, setUpdateForm] = useState({ message: '', progress_pct: '' });
 
@@ -245,7 +246,7 @@ function ProjectCard({ membership, project, teamColor, teamName }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function MyProjectsPage() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const [activeTab, setActiveTab] = useState('messages');
   const [seenTs, setSeenTs] = useState(() => getSeenTs(user?.id));
 

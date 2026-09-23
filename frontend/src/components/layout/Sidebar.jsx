@@ -1,9 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import useAuthStore from '../../store/authStore';
-import useUiStore from '../../store/uiStore';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { selectUser, logout } from '../../store/slices/authSlice';
+import { selectSidebarCollapsed, toggleSidebar } from '../../store/slices/uiSlice';
 import { sidebarGroups } from '../../config/sidebarConfig';
 import Avatar from '../ui/Avatar';
+import { authService } from '../../services/authService';
 
 /* ─── Inline SVG Icons ──────────────────────────────────────────────────────── */
 const IC = {
@@ -43,12 +45,20 @@ function Icon({ name, className = 'w-[15px] h-[15px]' }) {
 }
 
 export default function Sidebar() {
-  const { user, logout } = useAuthStore();
-  const { sidebarCollapsed, toggleSidebar } = useUiStore();
+  const user = useAppSelector(selectUser);
+  const sidebarCollapsed = useAppSelector(selectSidebarCollapsed);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const role = user?.role;
 
-  function handleLogout() { logout(); navigate('/login'); }
+  async function handleLogout() {
+    try {
+      await authService.logout();
+    } finally {
+      dispatch(logout());
+      navigate('/login');
+    }
+  }
 
   return (
     <aside
@@ -65,7 +75,7 @@ export default function Sidebar() {
       )}>
         {/* Logo — rectangular, wider, click to toggle */}
         <div
-          onClick={toggleSidebar}
+          onClick={() => dispatch(toggleSidebar())}
           className="bg-white/10 border border-white/10 overflow-hidden cursor-pointer flex items-center justify-center hover:bg-white/20 transition-colors shrink-0"
           style={{ width: sidebarCollapsed ? '44px' : '96px', height: '56px' }}
           title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -80,7 +90,7 @@ export default function Sidebar() {
         {/* Collapse arrow — only when expanded */}
         {!sidebarCollapsed && (
           <button
-            onClick={toggleSidebar}
+            onClick={() => dispatch(toggleSidebar())}
             className="text-white/20 hover:text-white/60 transition-colors p-1 rounded ml-auto shrink-0"
             aria-label="Collapse sidebar"
           >
@@ -201,7 +211,7 @@ export default function Sidebar() {
               aria-label="Logout" title="Logout">
               <Icon name="LogOut" className="w-[13px] h-[13px]" />
             </button>
-            <button onClick={toggleSidebar} className="text-white/15 hover:text-white/50 transition-colors p-1"
+            <button onClick={() => dispatch(toggleSidebar())} className="text-white/15 hover:text-white/50 transition-colors p-1"
               aria-label="Expand" title="Expand">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                 strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">

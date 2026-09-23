@@ -11,7 +11,8 @@ import ClockInWidget from '../../components/shared/ClockInWidget';
 import { queryClient } from '../../config/queryClient';
 import { formatIndianDate } from '../../utils/dateHelpers';
 import toast from 'react-hot-toast';
-import useAuthStore from '../../store/authStore';
+import { useAppSelector } from '../../store/hooks';
+import { selectUser } from '../../store/slices/authSlice';
 import { format } from 'date-fns';
 import { useState } from 'react';
 
@@ -28,7 +29,7 @@ function getGreeting() {
 }
 
 export default function EmployeeDashboard() {
-  const { user } = useAuthStore();
+  const user = useAppSelector(selectUser);
   const navigate = useNavigate();
   const [updateModal, setUpdateModal] = useState(null); // { project }
   const [updateForm, setUpdateForm] = useState({ message: '', progress_pct: '' });
